@@ -10,7 +10,7 @@ def get_caller_frame():
     for frame in frames[1:]:
         if frame.filename != current_frame.filename:
             return frame
-            
+
 
 def get_caller_filename():
     caller_frame = get_caller_frame()
@@ -22,9 +22,9 @@ def get_caller_filename():
 
 def clean_caller_filename():
     filename = get_caller_filename()
-    
+
     regex = re.compile(r"(.+)\s+\(part \d+\)")
-    
+
     return regex.search(filename).group(1)
 
 

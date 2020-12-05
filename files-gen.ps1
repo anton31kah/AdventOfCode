@@ -1,11 +1,8 @@
-$day = Get-Date -Format "'Day' dd"
-$filename = "$day Binary Boarding"
+$day = Get-Date -Format "'day'dd"
+# $day = 'day 05'
 
-# New-Item -ItemType directory "$day" 
-# New-Item -ItemType file "$day/$filename (part 1).py"
-# New-Item -ItemType file "$day/$filename (part 2).py"
-# New-Item -ItemType file "$day/$filename.in.txt"
-
-New-Item -ItemType file "$filename (part 1).py"
-New-Item -ItemType file "$filename (part 2).py"
-New-Item -ItemType file "$filename.in.txt"
+New-Item -ItemType directory "src/$day"
+New-Item -ItemType file "src/$day/__init__.py"
+New-Item -ItemType file "src/$day/part1.py"
+New-Item -ItemType file "src/$day/part2.py"
+New-Item -ItemType file "src/$day/in.txt"
