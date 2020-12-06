@@ -9,6 +9,8 @@
 			"**/__init__.py": true,
 			"**/__pycache__": true,
 			"**/*.pyc": true
-		}
+		},
+		"workbench.tree.indent": 16,
+		"workbench.tree.renderIndentGuides": "always"
 	}
 }
