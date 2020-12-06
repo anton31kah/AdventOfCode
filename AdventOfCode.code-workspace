@@ -4,5 +4,11 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.exclude": {
+			"**/__init__.py": true,
+			"**/__pycache__": true,
+			"**/*.pyc": true
+		}
+	}
 }
