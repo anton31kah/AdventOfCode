@@ -11,6 +11,9 @@
 			"**/*.pyc": true
 		},
 		"workbench.tree.indent": 16,
-		"workbench.tree.renderIndentGuides": "always"
+		"workbench.tree.renderIndentGuides": "always",
+		"editor.tabSize": 4,
+		"editor.insertSpaces": true,
+		"editor.detectIndentation": false
 	}
 }
