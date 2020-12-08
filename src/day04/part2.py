@@ -1,5 +1,5 @@
 import re
-from common import get_lines
+from src.common.common import get_lines
 
 
 regex = re.compile(r"(?=.*\bbyr:\d{4}\b)(?=.*\biyr:\d{4}\b)(?=.*\beyr:\d{4}\b)(?=.*\bhgt:\d+(cm|in)\b)(?=.*\bhcl:#[0-9a-fA-F]{6}\b)(?=.*\becl:(amb|blu|brn|gry|grn|hzl|oth)\b)(?=.*\bpid:\d{9}\b).*")
@@ -11,9 +11,9 @@ def check_fields(passport):
     eyr = re.search(r"eyr:(\d{4})\b", passport).group(1)
     hgt = re.search(r"hgt:(\d+)(cm|in)\b", passport).group(1)
     incm = re.search(r"hgt:(\d+)(cm|in)\b", passport).group(2)
-    
+
     byr, iyr, eyr, hgt = int(byr), int(iyr), int(eyr), int(hgt)
-    
+
     return 1920 <= byr <= 2002 and \
             2010 <= iyr <= 2020 and \
             2020 <= eyr <= 2030 and \

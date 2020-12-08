@@ -1,5 +1,5 @@
 import re
-from common import get_lines
+from src.common.common import get_lines
 
 
 def check(passport):
@@ -32,5 +32,5 @@ for line in lines:
 
 if regex.match(passport):
     valid += 1
-        
+
 print(valid)

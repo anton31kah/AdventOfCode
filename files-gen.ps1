@@ -1,8 +1,9 @@
-$day = Get-Date -Format "'day'dd"
-# $day = 'day 05'
+$starterCode = "from src.common.common import get_lines`n`n`nlines = get_lines()`n"
 
-New-Item -ItemType directory "src/$day"
-New-Item -ItemType file "src/$day/__init__.py"
-New-Item -ItemType file "src/$day/part1.py"
-New-Item -ItemType file "src/$day/part2.py"
-New-Item -ItemType file "src/$day/in.txt"
+$day = Get-Date -Format "'day'dd"
+# $day = 'day04'
+
+New-Item -Path "src/$day" -Name "__init__.py" -ItemType "file" -Force
+New-Item -Path "src/$day" -Name "part1.py" -ItemType "file" -Value $starterCode
+New-Item -Path "src/$day" -Name "part2.py" -ItemType "file" -Value $starterCode
+New-Item -Path "src/$day" -Name "in.txt" -ItemType "file"

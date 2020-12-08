@@ -1,7 +1,7 @@
-graph = None
+from src.common.common import get_lines
 
-with open('Day 03 Toboggan Trajectory.in.txt') as f:
-    graph = list(map(lambda l: l.strip(), f.readlines()))
+
+graph = get_lines()
 
 col = 0
 trees = 0
