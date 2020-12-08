@@ -2,7 +2,7 @@ import inspect
 import os
 
 
-def get_caller_frame():
+def __get_caller_frame():
     frames = inspect.stack()
 
     current_frame = inspect.stack()[0]
@@ -11,8 +11,8 @@ def get_caller_frame():
             return frame
 
 
-def get_caller_file_path():
-    caller_frame = get_caller_frame()
+def __get_caller_file_path():
+    caller_frame = __get_caller_frame()
     caller_file_path = caller_frame.filename
 
     caller_file_path = os.path.dirname(caller_file_path)
@@ -20,11 +20,11 @@ def get_caller_file_path():
     return caller_file_path
 
 
-def strip(line):
+def __strip(line):
     return line.strip()
 
 
 def get_lines():
-    file_path = get_caller_file_path()
+    file_path = __get_caller_file_path()
     with open(f'{file_path}/in.txt') as f:
-        return list(map(strip, f.readlines()))
+        return list(map(__strip, f.readlines()))
