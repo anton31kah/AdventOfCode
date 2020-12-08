@@ -1,20 +1,20 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"files.exclude": {
-			"**/__init__.py": true,
-			"**/__pycache__": true,
-			"**/*.pyc": true
-		},
-		"workbench.tree.indent": 16,
-		"workbench.tree.renderIndentGuides": "always",
-		"editor.tabSize": 4,
-		"editor.insertSpaces": true,
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "**/__init__.py": true,
+            "**/__pycache__": true,
+            "**/*.pyc": true
+        },
+        "workbench.tree.indent": 16,
+        "workbench.tree.renderIndentGuides": "always",
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
         "editor.detectIndentation": false,
         "git.allowForcePush": true
-	}
+    }
 }
