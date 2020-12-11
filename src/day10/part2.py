@@ -1,4 +1,4 @@
-import datetime
+from functools import lru_cache
 from src.common.common import get_lines
 
 
@@ -6,19 +6,12 @@ class Node:
     def __init__(self, value):
         self.value = value
         self.children = []
-        self.leaves = None
 
     def add_child(self, obj):
         self.children.append(obj)
-    
+
+    @lru_cache(maxsize=None)
     def count_leaves(self):
-        """
-        to count the different arrangments, we simply need to count all the leaves.
-        """
-
-        if self.leaves:
-            return self.leaves
-
         if not self.children:
             return 1
 
@@ -26,8 +19,6 @@ class Node:
 
         for child in self.children:
             count += child.count_leaves()
-
-        self.leaves = count
 
         return count
 
