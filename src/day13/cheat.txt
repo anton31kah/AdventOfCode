@@ -1,0 +1,23 @@
+MY BUSES
+
+t + idx mod busId = 0
+
+t + 0 mod 17 = 0
+t + 7 mod 41 = 0
+t + 17 mod 523 = 0
+t + 35 mod 13 = 0
+t + 36 mod 19 = 0
+t + 40 mod 23 = 0
+t + 48 mod 787 = 0
+t + 54 mod 37 = 0
+t + 77 mod 29 = 0
+
+www.wolframalpha.com
+
+EXAMPLE
+
+t + 0 mod 7 = 0
+t + 1 mod 13 = 0
+t + 4 mod 59 = 0
+t + 6 mod 31 = 0
+t + 7 mod 19 = 0
