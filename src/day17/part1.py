@@ -1,8 +1,8 @@
 from src.common.common import get_lines
 
 
-def prepare_grid(lines, cycles):
-    length = len(lines) + cycles * 2
+def prepare_grid(lines):
+    length = len(lines)
 
     grid = []
     for z_index in range(length):
@@ -12,19 +12,36 @@ def prepare_grid(lines, cycles):
             for col in range(length):
                 grid[z_index][row_index].append(False)
 
-    starting_position = len(grid) // 2 - len(lines) // 2
-    x, y, z = starting_position, starting_position, starting_position
+    middle = length // 2
+    middle = grid[middle]
 
-    lines_i = 0
-    lines_j = 0
-    for row in range(y, y + len(lines)):
-        lines_j = 0
-        for col in range(x, x + len(lines)):
-            grid[z][row][col] = lines[lines_i][lines_j] == '#'
-            lines_j += 1
-        lines_i += 1
+    for row_index, row in enumerate(lines):
+        for col_index, col in enumerate(row):
+            middle[row_index][col_index] = col == '#'
 
     return grid
+
+
+def pad_grid(grid, padding):
+    length = len(grid) + padding * 2
+
+    new_grid = []
+
+    new_grid.append([[False] * length] * length)
+
+    for z_index in range(padding, length - padding):
+        new_grid.append([])
+        new_grid[z_index].append([False] * length)
+        for row_index in range(padding, length - padding):
+            new_grid[z_index].append([False])
+            for col in range(padding, length - padding):
+                new_grid[z_index][row_index].append(grid[z_index - padding][row_index - padding][col - padding])
+            new_grid[z_index][row_index].append(False)
+        new_grid[z_index].append([False] * length)
+
+    new_grid.append([[False] * length] * length)
+
+    return new_grid
 
 
 def copy_grid(old_grid):
@@ -38,57 +55,50 @@ def copy_grid(old_grid):
     return new_grid
 
 
-def fetch_neighbors(position, grid):
-    neighbors = []
+def fetch_neighbors_new(position, grid):
+    active_neighbors = 0
 
     def handle_row(z_slice, row_idx, skip_middle):
-        if y - 1 < 0:
-            neighbors.extend([False] * (3 if not skip_middle else 2))
-        else:
-            row = z_slice[y - 1]
-            if x - 1 < 0:
-                neighbors.append(False)
-            else:
-                neighbors.append(row[x - 1])
-            
-            if not skip_middle:
-                neighbors.append(row[x])
+        active_neighbors = 0
 
-            if x + 1 >= len(grid):
-                neighbors.append(False)
-            else:
-                neighbors.append(row[x + 1])
+        if 0 <= row_idx < len(grid):
+            row = z_slice[row_idx]
+            if x - 1 >= 0:
+                active_neighbors += int(row[x - 1])
+
+            if not skip_middle:
+                active_neighbors += int(row[x])
+
+            if x + 1 < len(grid):
+                active_neighbors += int(row[x + 1])
+
+        return active_neighbors
 
     z, y, x = position
 
-    if z - 1 < 0:
-        neighbors.extend([False] * 9)
-    else:
+    if z - 1 >= 0:
         z_slice = grid[z - 1]
-        handle_row(z_slice, y - 1, False)
-        handle_row(z_slice, y, False)
-        handle_row(z_slice, y + 1, False)
+        active_neighbors += handle_row(z_slice, y - 1, False)
+        active_neighbors += handle_row(z_slice, y, False)
+        active_neighbors += handle_row(z_slice, y + 1, False)
 
     z_slice = grid[z]
-    handle_row(z_slice, y - 1, False)
-    handle_row(z_slice, y, True)
-    handle_row(z_slice, y + 1, False)
+    active_neighbors += handle_row(z_slice, y - 1, False)
+    active_neighbors += handle_row(z_slice, y, True)
+    active_neighbors += handle_row(z_slice, y + 1, False)
 
-    if z + 1 >= len(grid):
-        neighbors.extend([False] * 9)
-    else:
+    if z + 1 < len(grid):
         z_slice = grid[z + 1]
-        handle_row(z_slice, y - 1, False)
-        handle_row(z_slice, y, False)
-        handle_row(z_slice, y + 1, False)
+        active_neighbors += handle_row(z_slice, y - 1, False)
+        active_neighbors += handle_row(z_slice, y, False)
+        active_neighbors += handle_row(z_slice, y + 1, False)
 
-    return neighbors
+    return active_neighbors
 
 
 def apply_rules(position, grid):
     z, row, col = position
-    neighbors = fetch_neighbors((z, row, col), grid)
-    active_neighbors = sum(neighbors)
+    active_neighbors = fetch_neighbors_new((z, row, col), grid)
     if grid[z][row][col]:
         return active_neighbors in (2, 3)
     else:
@@ -117,6 +127,7 @@ def print_grid(grid):
 
     for z, z_slice in enumerate(grid):
         if any(flatten(z_slice)):
+            print()
             print(f"{z=}")
             for row in z_slice:
                 print(''.join(map(charactify, row)))
@@ -124,30 +135,31 @@ def print_grid(grid):
 
 def main():
     lines = get_lines()
-    lines = [
-        '.#.',
-        '..#',
-        '###',
-    ]
+    # lines = [
+    #     '.#.',
+    #     '..#',
+    #     '###',
+    # ]
+
+    grid = prepare_grid(lines)
+    # print('=' * 30, 'INITIAL')
+    # print_grid(grid)
 
     cycles = 6
-    grid = prepare_grid(lines, cycles)
-    print_grid(grid)
-    print('=' * 30)
-
     for cycle in range(1, cycles + 1):
+        grid = pad_grid(grid, 1)
+        # print('=' * 30, 'AFTER PADDING', cycle)
+        # print_grid(grid)
         grid = run_cycle(grid)
-        print_grid(grid)
-        print('=' * 30)
+        # print('=' * 30, 'AFTER CYCLE', cycle)
+        # print_grid(grid)
 
     active = 0
     for z_slice in grid:
         active += sum(flatten(z_slice))
-    
+
     print(active)
 
 
 if __name__ == "__main__":
     main()
-
-# src.day17.part1
