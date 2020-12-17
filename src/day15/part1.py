@@ -21,7 +21,7 @@ for r in range(len(numbers) + 1, 2020 + 1):
 
     if last_number in last_spoken_times:
         times = last_spoken_times[last_number]
-        
+
         if len(times) == 1:
             new_number = 0
         elif len(times) == 2:

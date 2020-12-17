@@ -11,7 +11,7 @@ def parse_rule(line):
     return name, ((range1min, range1max), (range2min, range2max))
 
 
-def read_input(lines):    
+def read_input(lines):
     rules = {}
     my_ticket = None
     nearby_tickets = []
@@ -50,7 +50,7 @@ def read_input(lines):
             nearby_tickets.append(ticket)
 
         line_idx += 1
-    
+
     return rules, my_ticket, nearby_tickets
 
 

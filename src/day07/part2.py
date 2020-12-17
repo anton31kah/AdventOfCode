@@ -7,24 +7,24 @@ class Tree:
         self.count = count
         self.parent = parent
         self.children = []
-    
+
     def add_child(self, color, count):
         node = Tree(color, count, self)
         self.children.append(node)
         return node
-    
+
     def count_bags(self):
         total = 0
         for child in self.children:
             total += child.count_bags()
         return self.count * total + self.count
-    
+
     def __hash__(self):
         if self.parent:
             return hash((self.color, self.count, hash(self.parent)))
         else:
             return hash((self.color, self.count))
-    
+
     def __eq__(self, other):
         return other is self
 
