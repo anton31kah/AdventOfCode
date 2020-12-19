@@ -1,0 +1,25 @@
+0: 8 11
+8: 42 | 42 8
+11: 42 31 | 42 11 31
+
+8 = (42)+
+  that means as many repeations of 42 as needed
+
+11 = 42 (11)? 31
+  that means that 11 can repeat within itself
+
+since 0 depends on 8 and 11
+it's enough to find 31 & 42
+
+then to check if a message is valid, we check either
+8. if it's a repeation of 42
+11. if it starts with 42 and ends with 31, then if the middle part satisifes this same rule
+
+0 is 8 AND THEN 11, but since 8 ends with 42 and 11 starts with 42
+it means 0: (42)+ (42)n (31)n
+
+
+
+
+
+This problem reminded me of the course Formal Languages and Automata by Professor Marija Mihova
