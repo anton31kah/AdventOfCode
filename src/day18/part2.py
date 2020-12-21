@@ -34,7 +34,7 @@ def calculate_expression(expression):
         idx = tokens.index('+')
         result = tokens[idx - 1] + tokens[idx + 1]
         tokens[idx - 1 : idx + 2] = [result]
-    
+
     while True:
         if '*' not in tokens:
             break
