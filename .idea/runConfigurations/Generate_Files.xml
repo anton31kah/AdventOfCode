@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Generate Files" type="PowerShellRunType" factoryName="PowerShell" scriptUrl="C:\Users\akahuadj\IdeaProjects\Other\AdventOfCode\files-gen.ps1" workingDirectory="C:\Users\akahuadj\IdeaProjects\Other\AdventOfCode" executablePath="$PROJECT_DIR$/../../../../../WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe">
+    <envs />
+    <method v="2" />
+  </configuration>
+</component>

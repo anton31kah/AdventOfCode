@@ -1,9 +1,8 @@
-$starterCode = "from src.common.common import get_lines`n`n`ndef main():`n    lines = get_lines()`n`n`nif __name__ == ""__main__"":`n    main()`n"
-
+$year = Get-Date -Format "'year'yyyy"
 $day = Get-Date -Format "'day'dd"
-# $day = 'dayX'
+# $day = 'day04'
 
-New-Item -Path "src/$day" -Name "__init__.py" -ItemType "file" -Force
-New-Item -Path "src/$day" -Name "part1.py" -ItemType "file" -Value $starterCode
-New-Item -Path "src/$day" -Name "part2.py" -ItemType "file" -Value $starterCode
-New-Item -Path "src/$day" -Name "in.txt" -ItemType "file"
+New-Item -Path "src/$year/$day" -Name "__init__.py" -ItemType "file" -Force
+Get-Content -Raw .\files-gen.template.py | New-Item -Path "src/$year/$day" -Name "part1.py" -ItemType "file"
+Get-Content -Raw .\files-gen.template.py | New-Item -Path "src/$year/$day" -Name "part2.py" -ItemType "file"
+New-Item -Path "src/$year/$day" -Name "in.txt" -ItemType "file"
