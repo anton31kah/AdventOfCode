@@ -5,5 +5,5 @@ def main():
     lines = get_lines()
 
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()

@@ -1,5 +1,5 @@
 # Usage
 
 ```
-python -m src.dayXY.partZ
+python -m src.year202W.dayXY.partZ
 ```
