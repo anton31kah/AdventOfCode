@@ -24,7 +24,7 @@ def __strip(line):
     return line.strip()
 
 
-def get_lines():
+def get_lines(suffix=''):
     file_path = __get_caller_file_path()
-    with open(f'{file_path}/in.txt') as f:
+    with open(f'{file_path}/in{suffix}.txt') as f:
         return list(map(__strip, f.readlines()))
