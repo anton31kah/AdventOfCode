@@ -30,11 +30,12 @@ class File:
 
 
 def main():
-    lines = get_lines()
+    lines = get_lines('')
 
     folders = {}
 
     current_folder = None
+    current_path = []
 
     for line in lines:
         if line.startswith('$'):
@@ -42,30 +43,37 @@ def main():
             if command.startswith('cd'):
                 _, folder_name = command.split(' ')
                 if folder_name == '..':
+                    current_path.pop()
                     current_folder = current_folder.parent
                 elif folder_name == '/':
-                    if folder_name not in folders:
-                        folders[folder_name] = Folder(folder_name)
-                    current_folder = folders[folder_name]
+                    current_path = [folder_name]
+                    current_path_name = ':'.join(current_path)
+                    if current_path_name not in folders:
+                        folders[current_path_name] = Folder(current_path_name)
+                    current_folder = folders[current_path_name]
                 else:
-                    if folder_name not in folders:
-                        folders[folder_name] = Folder(folder_name, current_folder)
-                    current_folder = folders[folder_name]
+                    current_path.append(folder_name)
+                    current_path_name = ':'.join(current_path)
+                    if current_path_name not in folders:
+                        folders[current_path_name] = Folder(current_path_name, current_folder)
+                    current_folder = folders[current_path_name]
             elif command.startswith('ls'):
                 # no-op
                 ...
         else:
             size_or_dir, name = line.split(' ')
             if size_or_dir == 'dir':
+                current_path_name = ':'.join(current_path + [name])
                 folder = Folder(name, current_folder)
                 current_folder.children.append(folder)
-                folders[name] = folder
+                folders[current_path_name] = folder
             else:
                 current_folder.children.append(File(name, int(size_or_dir), current_folder))
 
     total = 0
 
     for name, folder in folders.items():
+        # print(name, folder.size())
         if folder.size() <= 100000:
             total += folder.size()
 
