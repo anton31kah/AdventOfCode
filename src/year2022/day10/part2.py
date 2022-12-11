@@ -18,20 +18,18 @@ def main():
             crt.append('.')
 
     for line in lines:
-        if line.startswith('noop'):
-            cycle += 1
-            check_state()
-        elif line.startswith('addx'):
-            _, x_increase = line.split(' ')
-            x_increase = int(x_increase)
+        match line.split():
+            case ['noop']:
+                cycle += 1
+                check_state()
+            case ['addx', x_increase]:
+                cycle += 1
+                check_state()
 
-            cycle += 1
-            check_state()
+                cycle += 1
+                check_state()
 
-            cycle += 1
-            check_state()
-
-            sprite += x_increase
+                sprite += int(x_increase)
 
     big_crt = ''.join(crt)
     for line in wrap(big_crt, 40):

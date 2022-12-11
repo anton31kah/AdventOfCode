@@ -17,20 +17,18 @@ def main():
             total += cycle * state_x
 
     for line in lines:
-        if line.startswith('noop'):
-            cycle += 1
-            check_state()
-        elif line.startswith('addx'):
-            _, x_increase = line.split(' ')
-            x_increase = int(x_increase)
+        match line.split():
+            case ['noop']:
+                cycle += 1
+                check_state()
+            case ['addx', x_increase]:
+                cycle += 1
+                check_state()
 
-            cycle += 1
-            check_state()
+                cycle += 1
+                check_state()
 
-            cycle += 1
-            check_state()
-
-            state_x += x_increase
+                state_x += int(x_increase)
 
     print(total)
 

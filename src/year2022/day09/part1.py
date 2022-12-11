@@ -44,14 +44,15 @@ def main():
         # print(f"{direction},{steps}")
 
         for i in range(steps):
-            if direction == 'U':
-                head = head[0], head[1] + 1
-            elif direction == 'D':
-                head = head[0], head[1] - 1
-            elif direction == 'L':
-                head = head[0] - 1, head[1]
-            elif direction == 'R':
-                head = head[0] + 1, head[1]
+            match direction:
+                case 'U':
+                    head = head[0], head[1] + 1
+                case 'D':
+                    head = head[0], head[1] - 1
+                case 'L':
+                    head = head[0] - 1, head[1]
+                case 'R':
+                    head = head[0] + 1, head[1]
 
             # print(f"  {i + 1}: H:{head}, T:{tail}")
 

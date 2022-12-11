@@ -47,14 +47,15 @@ def main():
         for i in range(steps):
             head = knots[0]
 
-            if direction == 'U':
-                head = head[0], head[1] + 1
-            elif direction == 'D':
-                head = head[0], head[1] - 1
-            elif direction == 'L':
-                head = head[0] - 1, head[1]
-            elif direction == 'R':
-                head = head[0] + 1, head[1]
+            match direction:
+                case 'U':
+                    head = head[0], head[1] + 1
+                case 'D':
+                    head = head[0], head[1] - 1
+                case 'L':
+                    head = head[0] - 1, head[1]
+                case 'R':
+                    head = head[0] + 1, head[1]
 
             knots[0] = head
 
