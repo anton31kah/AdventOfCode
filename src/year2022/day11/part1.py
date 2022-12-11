@@ -60,7 +60,7 @@ def group_lines_per_monkey(lines):
 
 
 def main():
-    lines = get_lines('')
+    lines = get_lines('', strip=False)
 
     monkeys = [parse_monkey(monkey_lines) for monkey_lines in group_lines_per_monkey(lines)]
     monkeys_map = {monkey.id: monkey for monkey in monkeys}

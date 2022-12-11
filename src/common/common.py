@@ -24,7 +24,7 @@ def __strip(line):
     return line.strip()
 
 
-def get_lines(suffix=''):
+def get_lines(suffix='', *, strip=True):
     file_path = __get_caller_file_path()
     with open(f'{file_path}/in{suffix}.txt') as f:
-        return list(map(__strip, f.readlines()))
+        return [__strip(line) if strip else line.removesuffix('\n') for line in f.readlines()]
