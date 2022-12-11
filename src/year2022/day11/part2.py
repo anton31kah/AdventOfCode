@@ -1,3 +1,4 @@
+import re
 from src.common.common import get_lines
 
 
@@ -10,30 +11,20 @@ class Monkey:
         self.__when_true = when_true
         self.__when_false = when_false
 
+        self.test_mod = self.__test
+
 
     def calculate_worry(self, old, mod):
-        _, expression = self.__operation.split("=")
-        new = eval(expression)
+        new = eval(self.__operation)
         new %= mod
         return new
 
 
     def which_monkey_next(self, worry):
-        mod = self.__test.split()[-1]
-        when_true_id = self.__when_true.split()[-1]
-        when_false_id = self.__when_false.split()[-1]
-
-        mod = int(mod)
-
-        if worry % mod == 0:
-            return when_true_id
+        if worry % self.__test == 0:
+            return self.__when_true
         else:
-            return when_false_id
-
-
-    def get_test_mod(self):
-        mod = self.__test.split()[-1]
-        return int(mod)
+            return self.__when_false
 
 
     def __str__(self):
@@ -45,15 +36,20 @@ class Monkey:
 
 
 def parse_monkey(lines):
-    id = lines[0].split()[-1][:-1]
+    regex = (r"Monkey (\d+):\n"
+             r"  Starting items: ((\d+(, )?)+)\n"
+             r"  Operation: new = (old [*+] \w+)\n"
+             r"  Test: divisible by (\d+)\n"
+             r"    If true: throw to monkey (\d+)\n"
+             r"    If false: throw to monkey (\d+)")
+    result = re.findall(regex, '\n'.join(lines), re.MULTILINE)[0]
 
-    items = lines[1].split(':')[-1]
-    items = list(map(int, items.split(',')))
-
-    operation = lines[2].split(':')[-1]
-    test = lines[3].split(':')[-1]
-    when_true = lines[4].split(':')[-1]
-    when_false = lines[5].split(':')[-1]
+    id = int(result[0])
+    items = list(map(int, result[1].split(',')))
+    operation = result[4]
+    test = int(result[5])
+    when_true = int(result[6])
+    when_false = int(result[7])
 
     return Monkey(id, items, operation, test, when_true, when_false)
 
@@ -90,7 +86,7 @@ def main():
     #  when testing the modulo, this way we're sure that it's unique according to the CRT.
     mod = 1
     for monkey in monkeys:
-        mod *= monkey.get_test_mod()
+        mod *= monkey.test_mod
 
     inspection_times = {}
 
