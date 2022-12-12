@@ -89,21 +89,23 @@ def distance(graph, a, b):
     ha = value(graph, a)
     hb = value(graph, b)
 
-    if (ha, hb) == ('S', 'a') or (ha, hb) == ('z', 'E'):
-        return 0
+    # if (ha, hb) == ('S', 'a') or (ha, hb) == ('z', 'E'):
+    #     return 1
 
-    if ha in ('S', 'E') or hb in ('S', 'E'):
+    # if ha in ('S', 'E') or hb in ('S', 'E'):
+    #     return math.inf
+
+    hops = ord(hb) - ord(ha)
+
+    if hops > 1:
         return math.inf
 
-    dist = ord(hb) - ord(ha)
-
-    if dist > 1:
-        return math.inf
-
-    return dist
+    return 1
 
 
-def value(graph, node):
+def value(graph, node, new_value=None):
+    if new_value is not None:
+        graph[node[0]][node[1]] = new_value
     return graph[node[0]][node[1]]
 
 
@@ -123,8 +125,19 @@ def main():
                 case 'E':
                     target = (row_idx, col_idx)
 
+    value(grid, source, 'a')
+    value(grid, target, 'z')
+
     result = dijkstra(grid, source, target)
-    print(result)
+
+    # for row_idx, row in enumerate(grid):
+    #     for col_idx, col in enumerate(row):
+    #         if (row_idx, col_idx) in result:
+    #             print('#', end='')
+    #         else:
+    #             print('.', end='')
+    #     print()
+
     print(len(result) - 1)
 
 
