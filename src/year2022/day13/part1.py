@@ -64,7 +64,7 @@ def main():
         if compare_packets(*pair) is not False:
             in_right_order.append(idx)
 
-    print(in_right_order)
+    # print(in_right_order)
     print(sum(in_right_order))
 
 
