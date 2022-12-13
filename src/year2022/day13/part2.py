@@ -27,19 +27,17 @@ def parse_packet(text):
 def compare_packets(packet1, packet2):
     match packet1, packet2:
         case int(a), int(b):
-            if a == b:
-                return None
-            return a < b
+            return a - b
         case list(a), list(b):
             for i in range(max(len(a), len(b))):
                 if i >= len(a):
-                    return True
+                    return -1
                 if i >= len(b):
-                    return False
+                    return 1
                 items_comparison = compare_packets(a[i], b[i])
-                if items_comparison is not None:
+                if items_comparison != 0:
                     return items_comparison
-            return None
+            return 0
         case list(a), int(b):
             return compare_packets(a, [b])
         case int(a), list(b):
@@ -49,7 +47,7 @@ def compare_packets(packet1, packet2):
 
 
 def main():
-    lines = get_lines('S')
+    lines = get_lines('')
 
     lines.append('[[2]]')
     lines.append('[[6]]')
@@ -62,8 +60,8 @@ def main():
 
     packets.sort(key=functools.cmp_to_key(compare_packets))
 
-    for packet in packets:
-        print(packet)
+    # for packet in packets:
+    #     print(packet)
 
     index2 = packets.index([[2]]) + 1
     index6 = packets.index([[6]]) + 1
