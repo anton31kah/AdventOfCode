@@ -14,7 +14,7 @@ def distance(sensor, beacon):
 
 
 def main():
-    lines = get_lines('S')
+    lines = get_lines('')
 
     sensors_beacons = [parse_line(line) for line in lines]
 
@@ -27,45 +27,39 @@ def main():
 
     min_x = min_y = 0
     max_x = max_y = 4_000_000
-    max_x = max_y = 20
+    # max_x = max_y = 20
 
     for sensor, beacon in sensors_beacons:
         dis_beacon = distance(sensor, beacon)
         sx, sy = sensor
-        points = [
-            (sx - dis_beacon - 1, sy),
-            (sx + dis_beacon + 1, sy),
-            (sx, sy - dis_beacon - 1),
-            (sx, sy + dis_beacon + 1),
-        ]
-        for position in points:
-            in_range_of_sensor = False
-            for sensor, beacon in sensors_beacons:
-                dis_beacon = distance(sensor, beacon)
-                pos_beacon = distance(sensor, position)
-                if pos_beacon <= dis_beacon:
-                    in_range_of_sensor = True
-            if not in_range_of_sensor:
-                x, y = position
-                if min_x <= x <= max_x and min_y <= y <= max_y:
+
+        dy = 0
+
+        # print(len(range(sx - dis_beacon - 1, sx + dis_beacon + 2)))
+        for x in range(sx - dis_beacon - 1, sx + dis_beacon + 2):
+            y = sy - dy
+            position = x, y
+            # print(sensor, dis_beacon, position)
+
+            if min_x <= x <= max_x and min_y <= y <= max_y:
+                in_range_of_sensor = any(distance(sensor, position) <= distance(sensor, beacon) for sensor, beacon in sensors_beacons)
+                if not in_range_of_sensor:
                     print(position)
+                    print(x * 4_000_000 + y)
+                    exit()
 
-    # max_x = max_y = 4_000_000
+            y = sy + dy
+            position = x, y
+            # print(sensor, dis_beacon, position)
 
-    # for x in range(0, max_x):
-    #     print('x', x)
-    #     for y in range(0, max_y):
-    #         if y % 100_000 == 0:
-    #             print('y', y)
-    #         position = (x, y)
-    #         in_range_of_sensor = False
-    #         for sensor, beacon in sensors_beacons:
-    #             dis_beacon = distance(sensor, beacon)
-    #             pos_beacon = distance(sensor, position)
-    #             if pos_beacon <= dis_beacon:
-    #                 in_range_of_sensor = True
-    #         if not in_range_of_sensor:
-    #             print(position)
+            if min_x <= x <= max_x and min_y <= y <= max_y:
+                in_range_of_sensor = any(distance(sensor, position) <= distance(sensor, beacon) for sensor, beacon in sensors_beacons)
+                if not in_range_of_sensor:
+                    print(position)
+                    print(x * 4_000_000 + y)
+                    exit()
+
+            dy += 1
 
 
 if __name__ == "__main__":
