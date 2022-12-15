@@ -18,6 +18,13 @@ def main():
 
     sensors_beacons = [parse_line(line) for line in lines]
 
+    print(sum(((((distance(sensor, beacon) ** 2) * 2) ** 0.5) * 4) for sensor, beacon in sensors_beacons))
+    print()
+    for sensor, beacon in sensors_beacons:
+        dis_beacon = distance(sensor, beacon)
+        print(((((distance(sensor, beacon) ** 2) * 2) ** 0.5) * 4))
+
+    exit()
     max_x = max_y = 4_000_000
 
     for x in range(0, max_x):
