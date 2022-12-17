@@ -1,3 +1,4 @@
+from datetime import datetime
 from src.common.common import get_lines
 
 
@@ -62,19 +63,19 @@ def check_collides(grid, moving_figure):
     return len(grid & moving_figure.points) > 0
 
 
-def print_grid(grid: list[Figure], file=None):
-    points = [p for f in grid for p in f.points]
-    height = max(points, key=lambda p: p[1])[1]
-    canvas = [list('.......') for _ in range(height + 1)]
-    for x, y in points:
-        canvas[y][x] = '#'
-    canvas.reverse()
+def print_grid(grid: list[tuple[int, int]], file=None):
+    height = max(grid, key=lambda p: p[1])[1]
+    zero = min(grid, key=lambda p: p[1])[1]
+    canvas = [list('.......') for _ in range(zero, height + 1)]
+    for x, y in grid:
+        canvas[y - zero][x] = '#'
+    # canvas.reverse()
     for row in canvas:
         print(''.join(row), file=file)
 
 
 def main():
-    lines = get_lines('')
+    lines = get_lines('S')
 
     shifts = list(lines[0])
     shift_index = 0
@@ -82,7 +83,6 @@ def main():
     grid: set[tuple[int, int]] = set()
     grid_width = 7
     grid_rocks = 0
-    deleted_height = 0 ## TODO make use of this
 
     figure_index = 0
 
@@ -93,17 +93,21 @@ def main():
         shift_index += 1
 
         if not moving_figure:
-            if grid_rocks == 1000000000000:
+            if grid_rocks == 1_000_000_000_000:
+            # if grid_rocks == 2022:
                 break
 
-            if grid_rocks > 0:
+            if grid_rocks % 1_000 == 0:
+                print(grid_rocks, datetime.now().strftime("%H:%M:%S.%f"))
+
+            if len(grid) > 0:
                 height = max(grid, key=lambda f: f[1])[1]
                 height += 1
             else:
                 height = 0
             height += 3
+
             moving_figure = create_figure(figure_index, height)
-            grid_rocks += 1
 
         match shift:
             case '>':
@@ -121,9 +125,16 @@ def main():
         if check_collides(grid, moving_figure) or moving_figure.lowermost() < 0:
             moving_figure.up()
             grid.update(moving_figure.points)
+            grid_rocks += 1
             moving_figure = None
             figure_index += 1
             figure_index %= 5
+
+            height = max(grid, key=lambda f: f[1])[1]
+            zero = min(grid, key=lambda f: f[1])[1]
+            y_full_row = next((y for y in range(height, zero - 1, -1) if all((x, y) in grid for x in range(grid_width))), -1)
+            if y_full_row >= 0:
+                grid = set(filter(lambda p: p[1] >= y_full_row, grid))
 
     print(max(grid, key=lambda f: f[1])[1] + 1)
 
