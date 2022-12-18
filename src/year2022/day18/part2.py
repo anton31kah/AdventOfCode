@@ -1,39 +1,56 @@
 from src.common.common import get_lines
 
 
-class Point:
-    def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.position = (x, y, z)
-        self.neighbors = set()
+def adjacent(a, b):
+    ax, ay, az = a
+    bx, by, bz = b
+    return (abs(ax - bx) + abs(ay - by) + abs(az - bz)) == 1
 
 
-    def adjacent(self, other):
-        return (abs(self.x - other.x) + abs(self.y - other.y) + abs(self.z - other.z)) == 1
+def neighbors(point):
+    x, y, z = point
+    return [
+        (x - 1, y, z),
+        (x + 1, y, z),
+        (x, y - 1, z),
+        (x, y + 1, z),
+        (x, y, z - 1),
+        (x, y, z + 1),
+    ]
 
 
 def main():
     lines = get_lines('')
 
-    points = []
+    points = set(tuple(map(int, line.split(','))) for line in lines)
 
-    for line in lines:
-        x, y, z = list(map(int, line.split(',')))
-        points.append(Point(x, y, z))
+    visited = set()
+    to_visit = [(25,25,25)]
+    is_adjacent_with_point = set()
 
-    for point1 in points:
-        for point2 in points:
-            if point1.adjacent(point2):
-                point1.neighbors.add(point2)
-                point2.neighbors.add(point1)
+    while len(to_visit) > 0:
+        current = to_visit.pop()
+
+        if current in visited:
+            continue
+
+        for neighbor in neighbors(current):
+            x, y, z = neighbor
+
+            if neighbor in points:
+                is_adjacent_with_point.add(current)
+            elif -5 <= x <= 25 and -5 <= y <= 25 and -5 <= z <= 25:
+                # x{1-20}, y{0-21}, z{0-21}
+                to_visit.append(neighbor)
+
+        visited.add(current)
 
     total = 0
 
-    for point in points:
-        total += 6 - len(point.neighbors)
-        # print(point.position, 6 - len(point.neighbors), len(point.neighbors))
+    for point in is_adjacent_with_point:
+        for neighbor in neighbors(point):
+            if neighbor in points:
+                total += 1
 
     print(total)
 
