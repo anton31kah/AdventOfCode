@@ -40,6 +40,15 @@ class Material:
             geode=self.geode + other.geode,
         )
 
+    def __iadd__(self, other):
+        Material.__validate(other)
+
+        self.ore += other.ore
+        self.clay += other.clay
+        self.obsidian += other.obsidian
+        self.geode += other.geode
+        return self
+
     def __sub__(self, other):
         Material.__validate(other)
 
@@ -143,6 +152,19 @@ def hash_robots(robots: list[Robot]):
     return frozenset(count.items())
 
 
+def reduce_material(material: Material, robots: list[Robot], minutes: int) -> Material:
+    material_needed = Material()
+    for robot in robots:
+        for _ in range(minutes):
+            material_needed += robot.cost
+    return Material(
+        ore=min(material.ore, material_needed.ore),
+        clay=min(material.clay, material_needed.clay),
+        obsidian=min(material.obsidian, material_needed.obsidian),
+        geode=min(material.geode, material_needed.geode),
+    )
+
+
 @cached(cache=LRUCache(maxsize=1_000_000), key=lambda minutes, material, available_robots, blueprint_robots, path: hashkey(minutes, material, hash_robots(available_robots)))
 def play(minutes: int, material: Material, available_robots: list[Robot], blueprint_robots: list[Robot], path: list[str]):
     if minutes <= 0:
@@ -156,7 +178,8 @@ def play(minutes: int, material: Material, available_robots: list[Robot], bluepr
         if material >= robot.cost:
             robots_that_can_be_built[robot.type] = robot
 
-    # print(minutes, len(robots_that_can_be_built))
+    if minutes >= 10:
+        print(' ' * (24 - minutes), minutes, ':', material)
 
     for robot_to_build in robots_that_can_be_built.values():
         new_material = material + Material() - robot_to_build.cost
@@ -164,8 +187,12 @@ def play(minutes: int, material: Material, available_robots: list[Robot], bluepr
         for robot in available_robots:
             new_material += robot.produces
 
+        new_material = reduce_material(
+            new_material, blueprint_robots, minutes - 1)
+
         debug_line = f'[{minutes}] Built {robot_to_build.type}, {material} -> {new_material}, {hash_robots(available_robots)}'
-        options.append(play(minutes - 1, new_material, available_robots + [robot_to_build], blueprint_robots, path + [debug_line]))
+        options.append(play(minutes - 1, new_material, available_robots +
+                       [robot_to_build], blueprint_robots, path + [debug_line]))
 
     if 'geode' not in robots_that_can_be_built:
         # no robot built
@@ -174,8 +201,12 @@ def play(minutes: int, material: Material, available_robots: list[Robot], bluepr
         for robot in available_robots:
             new_material += robot.produces
 
+        new_material = reduce_material(
+            new_material, blueprint_robots, minutes - 1)
+
         debug_line = f'[{minutes}] Built nothing, {material} -> {new_material}, {hash_robots(available_robots)}'
-        options.append(play(minutes - 1, new_material, available_robots + [], blueprint_robots, path + [debug_line]))
+        options.append(play(minutes - 1, new_material, available_robots +
+                       [], blueprint_robots, path + [debug_line]))
 
     return max(options, key=lambda t: t[0])
 
@@ -210,7 +241,8 @@ def main():
         #     for robot in built_robots:
         #         robot.amount += 1
 
-        geode, path = play(24, Material(), blueprint.available_robots, blueprint.blueprint_robots, [])
+        geode, path = play(
+            24, Material(), blueprint.available_robots, blueprint.blueprint_robots, [])
         for line in path:
             print(line)
 
