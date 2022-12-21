@@ -49,6 +49,8 @@ def main():
 
         position = numbers.index(current)
 
+        # spent too much time before thinking of doing % len - 1 instead of % len
+        # the idea is that we're inserting the element to a list that doesn't have it yet
         new_position = (position + current.value) % (len(numbers) - 1)
 
         numbers.insert(new_position, numbers.pop(position))
