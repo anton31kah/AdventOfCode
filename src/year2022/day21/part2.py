@@ -30,20 +30,22 @@ def div(dependencies):
 
 
 def eq(dependencies):
-    return perform(dependencies, lambda a, b: a == b)
+    def complex_solve(a, b):
+        return round((b - a.real) / a.imag)
 
+    def complex_solve_wrapper(a, b):
+        return complex_solve(a, b) if type(a) is complex else complex_solve(b, a)
 
-def guess():
-    return 5
+    return perform(dependencies, lambda a, b: complex_solve_wrapper(a, b))
 
 
 def parse_line(line):
     parts = re.findall(r'\w+|[+\-*\/]', line)
     match parts:
-        case ['root', dep1, _, dep2]:
+        case ['root' as result, dep1, _, dep2]:
             return result, (eq([dep1, dep2]), [dep1, dep2])
-        case ['humn', _]:
-            return result, guess
+        case ['humn' as result, _]:
+            return result, 1j
         case [result, number]:
             return result, int(number)
         case [result, dep1, '+', dep2]:
@@ -62,8 +64,8 @@ def solve(expressions, search):
             return res
         case func, dependencies:
             return func(**{dep: solve(expressions, dep) for dep in dependencies})
-        case func:
-            return func
+        case x:
+            return x
 
 
 def main():
@@ -73,7 +75,7 @@ def main():
 
     result = solve(expressions, 'root')
 
-    print(int(result))
+    print(result)
 
 
 if __name__ == "__main__":
