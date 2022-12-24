@@ -26,23 +26,19 @@ def move_blizzards(blizzards, walls, grid_width, grid_height):
             case '>':
                 position = row, col + 1
                 if position in walls:
-                    # position = next(filter(lambda w: w[0] == row and w[1] != col + 1, walls))
                     position = row, 1
             case '<':
                 position = row, col - 1
                 if position in walls:
-                    # position = next(filter(lambda w: w[0] == row and w[1] != col - 1, walls))
                     position = row, grid_width - 2
             case 'v':
                 position = row + 1, col
                 if position in walls:
-                    # position = next(filter(lambda w: w[1] == col and w[0] != row + 1, walls))
-                    position = row, 1
+                    position = 1, col
             case '^':
-                position = row - 1, grid_height - 2
+                position = row - 1, col
                 if position in walls:
-                    # position = next(filter(lambda w: w[1] == col and w[0] != row - 1, walls))
-                    position = row, col
+                    position = grid_height - 2, col
         new_blizzards.add((position[0], position[1], direction))
     return new_blizzards
 
@@ -85,47 +81,8 @@ def print_grid(blizzards, walls, current, grid_width, grid_height):
         print()
 
 
-def find_shortest(minutes, blizzards, walls, current, waiting_time, initial_distance_to_target, target, width, height):
-    if current == target or minutes > 50:
-        return minutes
-
-    covered_distance = initial_distance_to_target - distance(current, target)
-    distance_should_have_covered = minutes // 5
-    # every 5 minutes, at least 1 distance covered
-    if covered_distance < distance_should_have_covered:
-        return -1
-
-    blizzards = move_blizzards(blizzards, walls, width, height)
-    blizzards_positions = set(map(lambda b: (b[0], b[1]), blizzards))
-
-    options = get_neighbors(current)
-
-    proposal = {}
-
-    for option in options:
-        if option not in blizzards_positions and option not in walls and 0 <= option[0] <= height and 0 <= option[1] <= width:
-            if current != option or waiting_time < 5:
-                proposal[option] = distance(option, target)
-
-    if len(proposal) == 0:
-        return -1
-
-    times = []
-
-    for position, _ in sorted(proposal.items(), key=lambda t: t[1]):
-        new_waiting_time = waiting_time + 1 if current == position else 0
-        time = find_shortest(minutes + 1, blizzards, walls, position, new_waiting_time, initial_distance_to_target, target, width, height)
-        if time >= 0:
-            times.append(time)
-
-    if len(times) == 0:
-        return -1
-
-    return min(times)
-
-
 def main():
-    lines = get_lines('S')
+    lines = get_lines('')
 
     height = len(lines)
     width = len(lines[0])
@@ -134,39 +91,37 @@ def main():
     current = (0, 1)
     target = (height - 1, width - 2)
 
-    minutes = find_shortest(0, blizzards, walls, current, 0, distance(current, target), target, width, height)
+    minutes = 0
 
-    # while True:
-    #     if current == target or minutes > 50:
-    #         break
+    queue = {current}
 
-    #     blizzards = move_blizzards(blizzards, walls, width, height)
-    #     blizzards_positions = set(map(lambda b: (b[0], b[1]), blizzards))
+    last_distance = distance(current, target)
 
-    #     options = get_neighbors(current)
+    while True:
+        blizzards = move_blizzards(blizzards, walls, width, height)
+        blizzards_positions = set(map(lambda b: (b[0], b[1]), blizzards))
 
-    #     proposal = {}
+        proposal = set()
 
-    #     for option in options:
-    #         if option not in blizzards_positions and option not in walls:
-    #             proposal[option] = distance(option, target)
+        for el in sorted(queue, key=lambda p: distance(p, target)):
+            options = get_neighbors(el)
+            for option in options:
+                if 0 <= option[0] <= height and 0 <= option[1] <= width:
+                    proposal.add(option)
 
-    #     # if len(proposal) == 0:
-    #     #     print(current)
-    #     #     print(minutes)
-    #     #     print_grid(blizzards, walls, current, width, height)
-    #     #     print()
+        queue = proposal - blizzards_positions - walls
 
-    #     current = min(proposal.items(), key=lambda t: t[1])[0]
+        current_last_distance = min(distance(x, target) for x in queue)
+        if current_last_distance < last_distance:
+            print('current_last_distance', current_last_distance)
+            last_distance = current_last_distance
 
-    #     # print(current)
-    #     # print(minutes)
-    #     # print_grid(blizzards, walls, current, width, height)
-    #     # print()
+        if target in queue:
+            break
 
-    #     minutes += 1
+        minutes += 1
 
-    print(minutes)
+    print(minutes + 1)
 
 
 if __name__ == "__main__":
