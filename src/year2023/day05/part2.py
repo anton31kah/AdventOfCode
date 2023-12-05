@@ -75,8 +75,6 @@ def main():
     seeds, conversions = read_input('')
     seeds_ranges = seeds[:]
 
-    print(seeds_ranges)
-
     for conv in CONVERSIONS:
         conversion_ranges = conversions[conv]
 
@@ -95,16 +93,26 @@ def main():
                     new_ranges.append((dest_start - start_diff, dest_end - end_diff))
                     covered_ranges.append((source_start - start_diff, source_end - end_diff))
             left_to_cover = []
-            # find left to cover
-            # currently range_to_cover [..........................................................]
-            # currently covered_ranges      [.....]        [.......]             [............]
-            # need to find uncovered = [....]     [........]       [.............]            [...]
-            # print('covered_ranges', covered_ranges, 'for', range_to_cover)
+            covered_ranges = list(sorted(covered_ranges))
+            for range_idx, (range_start, range_end) in enumerate(covered_ranges):
+                if range_idx == 0:
+                    if len(range(seed_start, range_start)):
+                        left_to_cover.append((seed_start, range_start))
+                
+                next_idx = range_idx + 1
+                if next_idx >= len(covered_ranges):
+                    if len(range(range_end, seed_end)):
+                        left_to_cover.append((range_end, seed_end))
+                else:
+                    next_range_start, next_range_end = covered_ranges[next_idx]
+                    if len(range(range_end, next_range_start)):
+                        left_to_cover.append((range_end, next_range_start))
+            if not covered_ranges:
+                left_to_cover.append(range_to_cover)
+            new_ranges.extend(left_to_cover)
 
         seeds_ranges = new_ranges
-        print(seeds_ranges)
 
-    print(seeds_ranges)
     print(min(start for start, end in seeds_ranges))
 
 
