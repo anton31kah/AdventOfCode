@@ -1,9 +1,18 @@
 import re
+from math import ceil, floor, sqrt
 from src.common.common import get_lines
 
 
 def calculate_distance(speed, time):
     return speed * (time - speed)
+
+
+# NOT MY SOLUTION, THIS CAME AFTER 
+def quick_math(time, distance):
+    b1 = floor((time + sqrt(time**2 - 4 * distance))/2)
+    b2 = ceil((time - sqrt(time**2 - 4 * distance))/2)
+
+    return b1 - b2 + 1
 
 
 def main():
@@ -24,6 +33,7 @@ def main():
         if time % 2 == 0:
             total -= 1
 
+        print('my', total, 'math', quick_math(time, distance))
         product *= total
 
     print(product)
