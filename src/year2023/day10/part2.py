@@ -1,23 +1,77 @@
 from src.common.common import get_lines
+from collections import deque
 
 
-def pretty_print(lines, in_loop=None):
+def pretty_print(lines, loop_points=None, points_outside_loop=None, no_print=False):
+    result = []
+
     for y, line in enumerate(lines):
         new_line = line.replace('|', '│').replace('-', '─').replace('L', '└').replace('.', '.').replace('F', '┌').replace('J', '┘').replace('7', '┐')
 
-        if in_loop is not None:
+        if points_outside_loop is not None and loop_points is not None:
             new_line_builder = list(new_line)
             for x, c in enumerate(new_line):
-                if c == '.':
-                    if (x, y) in in_loop:
-                        new_line_builder[x] = 'I'
-                    else:
-                        new_line_builder[x] = 'O'
+                if (x, y) in points_outside_loop:
+                    new_line_builder[x] = 'O'
+                elif (x, y) not in loop_points:
+                    new_line_builder[x] = 'I'
             new_line = ''.join(new_line_builder)
 
-        print(new_line)
+        if not no_print:
+            print(new_line)
 
-    print()
+        result.append(new_line)
+    
+    if not no_print:
+        print()
+
+    return result
+
+
+magnified = {
+    '|': [[' ', '|', ' '],
+          [' ', '|', ' '],
+          [' ', '|', ' ']],
+    '-': [[' ', ' ', ' '],
+          ['-', '-', '-'],
+          [' ', ' ', ' ']],
+    'J': [[' ', '|', ' '],
+          ['-', 'J', ' '],
+          [' ', ' ', ' ']],
+    'F': [[' ', ' ', ' '],
+          [' ', 'F', '-'],
+          [' ', '|', ' ']],
+    'L': [[' ', '|', ' '],
+          [' ', 'L', '-'],
+          [' ', ' ', ' ']],
+    '7': [[' ', ' ', ' '],
+          ['-', '7', ' '],
+          [' ', '|', ' ']],
+    '.': [[' ', ' ', ' '],
+          [' ', '.', ' '],
+          [' ', ' ', ' ']],
+}
+def magnify(lines):
+    result = [[] for x in range(len(lines) * 3)]
+
+    for y, line in enumerate(lines):
+        for x, char in enumerate(line):
+            for i in range(3):
+                result[y * 3 + i].extend(magnified[char][i])
+
+    return [''.join(line) for line in result]
+
+
+def demagnify(lines):
+    result = [[] for x in range(len(lines) // 3)]
+
+    i = 0
+    for y in range(1, len(lines), 3):
+        for x in range(1, len(lines[y]), 3):
+            result[i].append(lines[y][x])
+        i += 1
+
+    return [''.join(line) for line in result]
 
 
 def find_start(lines):
@@ -26,7 +80,6 @@ def find_start(lines):
             if lines[y][x] == 'S':
                 return (x, y)
     return None
-
 
 
 horizontally_connected = {
@@ -146,53 +199,57 @@ def get_loop_points(lines, start_point):
     return visited
 
 
-def count_ray_case_intersections(lines, point, loop_points):
-    if point in loop_points:
-        raise ValueError("Initial point on loop edge " + point)
+def find_points_outside_loop(lines, loop_points):
+    visited = {(0,0)}
 
-    count = 0
+    queue = deque([(0, 0)])
 
-    x, y = point
-
-    for i in range(x + 1, len(lines[y])):
-        current = x + i, y
-        if current in loop_points and lines[y][x + i] != '-':
-            count += 1
-
-    return count
-
-
-def find_points_in_loop(lines, loop_points):
-    in_loop = set()
-
-    for y, line in enumerate(lines):
-        for x, c in enumerate(line):
-            current = x, y
-            if c == '.':
-                num = count_ray_case_intersections(lines, current, loop_points)
-                if num % 2 == 1:
-                    in_loop.add(current)
-
-    return in_loop
+    while queue:
+        current = queue.popleft()
+        x, y = current
+        directions = [
+            (x - 1, y),
+            (x, y - 1),
+            (x + 1, y),
+            (x, y + 1)
+        ]
+        for d in directions:
+            dx, dy = d
+            inside_bounds = dx >= 0 and dy >= 0 and dx < len(lines[0]) and dy < len(lines)
+            if inside_bounds and d not in loop_points and d not in visited:
+                visited.add(d)
+                queue.append(d)
+    
+    return visited
 
 
 def main():
-    lines = get_lines('S3')
+    lines = get_lines('')
     
-    pretty_print(lines)
+    # pretty_print(lines)
 
     start_point = find_start(lines)
     
     start_point_pipe = determine_best_start_pipe(lines, start_point)
     lines[start_point[1]] = lines[start_point[1]].replace('S', start_point_pipe)
     
+    lines = magnify(lines)
+    start_point = start_point[0] * 3 + 1, start_point[1] * 3 + 1
+
+    # pretty_print(lines)
+
     loop = get_loop_points(lines, start_point)
 
-    points_in_loop = find_points_in_loop(lines, loop)
-    
-    pretty_print(lines, points_in_loop)
+    points_outside_loop = find_points_outside_loop(lines, loop)
 
-    print(len(points_in_loop))
+    notated_lines = pretty_print(lines, loop, points_outside_loop, no_print=True)
+
+    notated_lines = demagnify(notated_lines)
+
+    # pretty_print(notated_lines)
+
+    count_inside = sum(line.count('I') for line in notated_lines)
+    print(count_inside)
 
 
 if __name__ == "__main__":
