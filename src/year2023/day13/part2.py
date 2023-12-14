@@ -21,37 +21,28 @@ def transpose(pattern):
     return [''.join(i) for i in zip(*pattern)]
 
 
-def in_bounds(array, index):
-    return 0 <= index < len(array)
+def find_reflection_start(pattern, ignore=None):
+    for i in range(len(pattern) // 2, 0, -1):
+        if pattern[:i] == list(reversed(pattern[i:i*2])) and (ignore is None or i != ignore):
+            return i
+    return -1
 
 
-def count_reflection_rows(pattern, around):
-    offset = 0
-    while True:
-        if (in_bounds(pattern, around + offset)
-            and in_bounds(pattern, around - 1 - offset)
-            and pattern[around + offset] == pattern[around - 1 - offset]):
-            offset += 1
-        else:
-            break
-    return offset
+def find_reflection_end(pattern, ignore=None):
+    for i in range(len(pattern) // 2, 0, -1):
+        if pattern[-i:] == list(reversed(pattern[-i*2:-i])) and (ignore is None or len(pattern) - i != ignore):
+            return len(pattern) - i
+    return -1
 
 
-def find_reflection(pattern):
-    res = {}
-    for i in range(1, len(pattern)):
-        if pattern[i] == pattern[i - 1]:
-            res[i] = count_reflection_rows(pattern, i)
-    if not res:
-        return -1, -1
-
-    for around, count in res.items():
-        is_start = around - count == 0
-        is_end = around + count == len(pattern)
-        if is_start or is_end:
-            return around, count
-    
-    return -1, -1
+def find_reflection(pattern, ignore=None):
+    end = find_reflection_end(pattern, ignore)
+    if end >= 1:
+        return end
+    start = find_reflection_start(pattern, ignore)
+    if start >= 1:
+        return start
+    return -1
 
 
 def flip(pattern, x, y):
@@ -69,26 +60,22 @@ def flip(pattern, x, y):
 def main():
     lines = get_lines('')
     patterns = parse_input(lines)
-    i = 0
     score = 0
     for pattern in patterns:
-        i += 1
         old_col = find_reflection(transpose(pattern))
         old_row = find_reflection(pattern)
-        cols = []
-        rows = []
+        cols = set()
+        rows = set()
         for y in range(len(pattern)):
             for x in range(len(pattern[0])):
                 new_pattern = flip(pattern, x, y)
-                cols.append(find_reflection(transpose(new_pattern)))
-                rows.append(find_reflection(new_pattern))
-        cols = set([(i, j) for i, j in cols if i >= 0 and j >= 0 and (i, j) != old_col])
-        rows = set([(i, j) for i, j in rows if i >= 0 and j >= 0 and (i, j) != old_row])
-        print(cols, rows)
-        # if count_around_col > count_around_row:
-        #     score += col
-        # elif count_around_row > count_around_col:
-        #     score += row * 100
+                new_col = find_reflection(transpose(new_pattern), old_col)
+                if new_col >= 1 and new_col != old_col:
+                    cols.add(new_col)
+                new_row = find_reflection(new_pattern, old_row)
+                if new_row >= 1 and new_row != old_row:
+                    rows.add(new_row)
+        score += next(iter(cols), 0) + next(iter(rows), 0) * 100
     print(score)
 
 
