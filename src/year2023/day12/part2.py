@@ -1,122 +1,47 @@
 from src.common.common import get_lines
+from functools import cache
 
 
 def parse_line(line):
-    first, second = line.split()
+    springs, groups = line.split()
 
-    groups = [int(x) for x in second.split(',')]
+    groups = tuple(int(x) for x in groups.split(','))
 
-    first = '?'.join(([first] * 5))
-    second = [i for _ in range(5) for i in second]
+    springs = '?'.join(([springs] * 5))
+    groups = tuple(i for _ in range(5) for i in groups)
 
-    hash_ranges = []
-    unknown = []
-
-    for i, c in enumerate(first):
-        match c:
-            case '?':
-                unknown.append(i)
-            case '#':
-                if not hash_ranges:
-                    hash_ranges.append([i, i])
-                else:
-                    if hash_ranges[-1][-1] + 1 == i:
-                        hash_ranges[-1][-1] = i
-                    else:
-                        hash_ranges.append([i, i])
-
-    return hash_ranges, unknown, groups
+    return springs, groups
 
 
-def all_indexes(string, search_char):
-    return [idx for idx, str_char in enumerate(string) if str_char == search_char]
+@cache
+def solve(springs, groups):
+    if not springs and not groups:
+        return True
+    if not springs:
+        return False
+    if not groups:
+        return '#' not in springs
+    
+    min_springs = sum(groups) + len(groups) - 1 # 1,1,3 -> (1+1+3)*'#' + 2*'.'
+    if len(springs) < min_springs:
+        return False;
 
+    springs_head, springs_tail = springs[0], springs[1:]
+    groups_head, groups_tail = groups[0], groups[1:]
 
-def copy_nested_list(arr):
-    return [item[:] for item in arr]
-
-
-def in_bounds(arr, idx):
-    return 0 <= idx < len(arr)
-
-
-def generate_options(unknown):
-    value = 2 ** len(unknown) - 1
-    for i in range(value + 1):
-        string = format(i, f"0{len(unknown)}b") # .replace('0', '.').replace('1', '#')
-        yield [unknown[j] for j in all_indexes(string, '1')]
-
-
-def merge_hashes(hash_ranges, hash_positions):
-    result = copy_nested_list(hash_ranges)
-
-    if not result:
-        if not hash_positions:
-            return []
-        else:
-            result = [[hash_positions[0], hash_positions[0]]]
-
-    current_range_index = 0
-
-    for pos in hash_positions:
-        while True:
-            start, end = result[current_range_index]
-
-            if start <= pos <= end:
-                break
-
-            if pos == end + 1:
-                result[current_range_index][-1] = pos
-                if in_bounds(result, current_range_index + 1) and result[current_range_index + 1][0] == pos + 1:
-                    result[current_range_index][-1] = result[current_range_index + 1][-1]
-                    result.pop(current_range_index + 1)
-                break
-            elif pos == start - 1:
-                result[current_range_index][0] = pos
-                if in_bounds(result, current_range_index - 1) and result[current_range_index - 1][-1] == pos - 1:
-                    result[current_range_index][0] = result[current_range_index - 1][0]
-                    result.pop(current_range_index - 1)
-                    current_range_index -= 1
-                break
-            elif pos > end + 1:
-                if in_bounds(result, current_range_index + 1):
-                    if pos < result[current_range_index + 1][0] - 1:
-                        result.insert(current_range_index + 1, [pos, pos])
-                        break
-                    else:
-                        current_range_index += 1
-                else:
-                    result.append([pos, pos])
-                    break
-            elif pos < start - 1:
-                if in_bounds(result, current_range_index - 1):
-                    if pos > result[current_range_index - 1][-1] + 1:
-                        result.insert(current_range_index, [pos, pos])
-                        break
-                    else:
-                        current_range_index -= 1
-                else:
-                    result.insert(0, [pos, pos])
-                    break
-
-    return result
-
-
-def count_options(hash_ranges, unknown, groups):
-    count_valid = 0
-    # print(hash_ranges)
-    for option in generate_options(unknown):
-        merged_hashes = merge_hashes(hash_ranges, option)
-        counts = [e + 1 - s for s, e in merged_hashes]
-        valid = counts == groups
-        # print(f"    {'x' if valid else ' '} +{option} = {merged_hashes}")
-        if valid:
-            count_valid += 1
-    return count_valid
+    match springs_head:
+        case '#':
+            if '.' in springs[:groups_head] or springs[groups_head] == '#':
+                return False
+            return solve(springs[groups_head + 1:], groups_tail)
+        case '.':
+            return solve(springs_tail, groups)
+        case '?':
+            return solve('#' + springs_tail, groups) + solve('.' + springs_tail, groups)
 
 
 def main():
-    lines = get_lines('S')
+    lines = get_lines('')
 
     total = 0
 
@@ -124,9 +49,8 @@ def main():
 
     for line in lines:
         progress += 1
-        print(f"{progress/len(lines)*100}%")
-        hash_ranges, unknown, groups = parse_line(line)
-        total += count_options(hash_ranges, unknown, groups)
+        springs, groups = parse_line(line)
+        total += solve(springs + '.', groups) # add . to make if check easier
     
     print(total)
 
