@@ -245,6 +245,14 @@ def main():
 
     print(max_energized)
 
+    """
+    this solution takes 10 minutes to compute
+    the better approach would be to store the beams we went through and and know where they end.
+    basically we now do 440 solvings, but that way for every field (12100) positions we would have 4 places for each direction
+    that is, 48400 beams for every place, we would basically cache the results as they would be the same no matter where we start
+    BUT, implementing that will take longer than 10 minutes so it's not worth it, a saturday is to be enjoyed :D
+    """
+
 
 if __name__ == "__main__":
     main()
