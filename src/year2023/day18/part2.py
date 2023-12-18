@@ -8,9 +8,9 @@ def read_line(line):
     meters = int(meters)
     color = color[2:-1]
 
-    meters = int(color[:5], 16)
+    # meters = int(color[:5], 16)
     
-    direction = 'RDLU'[int(color[5])]
+    # direction = 'RDLU'[int(color[5])]
 
     return direction, meters, color
 
@@ -89,13 +89,38 @@ def flood_fill(wall, start):
     return visited
 
 
+def find_area(instructions):
+    points = [(0, 0)]
+    current = (0, 0)
+    for direction, meters, _ in instructions:
+        dx, dy = get_diff(direction)
+        x, y = current
+        m = meters
+        new = m * dx + x, m * dy + y
+        current = new
+        points.append(new)
+    
+    area = 0
+
+    for i in range(len(points)):
+        point1 = points[i]
+        point2 = points[(i + 1) % len(points)]
+
+        x1, y1 = point1
+        x2, y2 = point2
+
+        area += (x1 * y2 - x2 * y1)
+
+    return area
+
+
 def main():
     lines = get_lines('S')
     instructions = [read_line(line) for line in lines]
-    wall = create_wall(instructions)
-    boundaries = get_boundaries(wall)
-    inner = flood_fill(wall, (1, 1))
-    print(len(inner))
+    # wall = create_wall(instructions)
+    # boundaries = get_boundaries(wall)
+    # inner = flood_fill(wall, (1, 1))
+    print(find_area(instructions))
     # print_grid(wall, (-10, 10, -10, 10))
 
 
