@@ -8,7 +8,7 @@
             "name": "Python: Module",
             "type": "python",
             "request": "launch",
-            "module": "src.year2023.day16.part1",
+            "module": "src.year2023.day17.part1",
             "justMyCode": true
         }
     ]
