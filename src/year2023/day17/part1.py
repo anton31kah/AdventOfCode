@@ -7,7 +7,7 @@ def print_path(grid, path):
     for y, row in enumerate(grid):
         for x, col in enumerate(row):
             point = (x, y)
-            if point in path:
+            if point in (p for p, d in path):
                 print(text[col], end='')
             else:
                 print(col, end='')
@@ -28,30 +28,54 @@ def apply_diff(point, change):
     return x + dx, y + dy
 
 
-def find_path(previous, point):
+def find_path(previous, direction, point):
     path = [point]
     curr = point
     while curr in previous and previous[curr]:
+        path[-1] = path[-1], direction[curr]
         path.append(previous[curr])
         curr = previous[curr]
-    return path
+    return list(reversed(path))
     
 
-def check_last_three(previous, point):
-    path = find_path(previous, point)
+def last_three_same_direction(previous, direction, point):
+    N = 3
 
-    if len(path) >= 3:
-        ys = {y for x, y in path[:3]}
-        xs = {x for x, y in path[:3]}
-        if len(xs) == 1 or len(ys) == 1:
-            return False
+    path = find_path(previous, direction, point)
+    last_three = path[-N:]
 
-    return True
+    if len(last_three) >= N:
+        last_three_directions = set([d for p, d in last_three])
+        all_are_directions = all(type(x) is str for x in last_three_directions)
+        all_are_same_direction = len(last_three_directions) == 1
+        if all_are_directions:
+            return all_are_same_direction
+
+    return False
+
+
+def get_direction_between(point1, point2):
+    x1, y1 = point1
+    x2, y2 = point2
+    dx = x2 - x1
+    dy = y2 - y1
+    if abs(dx) + abs(dy) != 1:
+        raise ValueError(f"Points {point1} {point2} are too far apart!")
+    match (dx, dy):
+        case (1, 0):
+            return '>'
+        case (-1, 0):
+            return '<'
+        case (0, 1):
+            return 'v'
+        case (0, -1):
+            return '^'
 
 
 def dijkstra(grid, start, end):
     distance = {}
     previous = {}
+    direction = {}
     
     queue = []
     for y, row in enumerate(grid):
@@ -60,6 +84,7 @@ def dijkstra(grid, start, end):
             queue.append(point)
             distance[point] = math.inf
             previous[point] = None
+            direction[point] = None
     
     distance[start] = 0
 
@@ -72,13 +97,15 @@ def dijkstra(grid, start, end):
             if neighbor is not None:
                 neighbor_point, neighbor_value = neighbor
                 alt = distance[current] + neighbor_value
-                if alt < distance[neighbor_point] and check_last_three(previous, current):
+                # print(last_three_same_direction(previous, direction, current), current, neighbor_point)
+                if alt < distance[neighbor_point] and not last_three_same_direction(previous, direction, current):
                     distance[neighbor_point] = alt
                     previous[neighbor_point] = current
+                    direction[neighbor_point] = get_direction_between(current, neighbor_point)
 
-    path = find_path(previous, end)
+    path = find_path(previous, direction, end)
 
-    return distance[end], list(reversed(path))
+    return distance[end], path
 
 
 def main():
@@ -89,7 +116,9 @@ def main():
 
     print_path(grid, path)
 
-    print(distance, path)
+    print(distance)
+    for p in path:
+        print(p)
 
 
 if __name__ == "__main__":
