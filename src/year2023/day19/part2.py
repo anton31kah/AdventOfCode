@@ -1,4 +1,5 @@
 import re
+from typing import Sequence
 from src.common.common import get_lines
 from dataclasses import dataclass
 
@@ -62,6 +63,14 @@ class Workflow:
             if r.supports(part):
                 return r.test(part)
 
+@dataclass
+class Node:
+    value: str
+    left: 'Node'
+    right: 'Node'
+    parent: 'Node'
+    parent_link: list[Compare]
+
 
 def read_input(lines):
     workflows = {}
@@ -96,6 +105,48 @@ def read_input(lines):
             parts.append(Part(x, m, a, s))
     
     return workflows, parts
+
+def empty_ranges():
+    return {
+        'x': range(1, 4001),
+        'm': range(1, 4001),
+        'a': range(1, 4001),
+        's': range(1, 4001),
+    }
+
+def reverse_compare(compare: Compare) -> Compare:
+    match compare.op:
+        case '>':
+            return Compare(compare.att, '<', compare.val + 1)
+        case '<':
+            return Compare(compare.att, '>', compare.val - 1)
+
+def merge_ranges(ranges: dict[str, range], compare: Compare):
+    if not compare:
+        return ranges.copy()
+    res = ranges.copy()
+    match compare.op:
+        case '>':
+            res[compare.att] = range(compare.val + 1, res[compare.att].stop)
+        case '<':
+            res[compare.att] = range(res[compare.att].start, compare.val)
+    return res
+
+def build_tree(workflows: dict[str, Workflow]):
+    root = Node('in', None, None, None, None)
+    current = root
+    
+    else_rules: list[Compare] = []
+    for rule in workflows[current.value].rules:
+        if rule.compare:
+            if not else_rules:
+                current.left = Node(rule.result, None, None, current, rule.compare)
+                else_rules.append(reverse_compare(rule.compare))
+            else:
+                ...
+            ranges = merge_ranges(ranges, rule.compare)
+            ...
+        ...
 
 
 def main():
