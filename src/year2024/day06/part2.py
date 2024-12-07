@@ -80,7 +80,7 @@ def print_grid(lines, obstacles, visited, guard, direction, new_obstacle):
 
 
 def contains_sequence(big_list, small_list):
-    for i in range(len(big_list)):
+    for i in reversed(range(len(big_list))):
         if big_list[i:i + len(small_list)] == small_list:
             return True
     return False
@@ -92,14 +92,14 @@ def run_guard_run(lines, obstacles, initial_guard, new_obstacle):
     visited = defaultdict(set)
     path = []
 
-    last_n = 3
+    last_n = 10
 
     try:
         while in_grid(lines, guard):
             visited[guard].add(direction_symbol(direction))
 
             path.append(guard)
-            if len(path) % 3 == 0 and contains_sequence(path[:-last_n], path[-last_n:]):
+            if len(path) % (last_n * 100) == 0 and contains_sequence(path[:-last_n], path[-last_n:]):
                 return 'hit', visited
 
             new_guard = move_to_direction(guard, direction)
