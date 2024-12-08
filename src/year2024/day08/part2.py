@@ -18,7 +18,18 @@ def in_bounds(lines, position):
 
 
 def print_grid(grid, anti_nodes, lines):
+    print('   ', end='')
+    for col in range(len(lines[0])):
+        print(f'{col}'.zfill(2)[0], end='')
+    print()
+    print('   ', end='')
+    for col in range(len(lines[0])):
+        print(f'{col}'.zfill(2)[-1], end='')
+    print()
+
     for row, line in enumerate(lines):
+        print(f'{row}'.zfill(2), end=' ')
+
         for col, cell in enumerate(line):
             to_print = cell
 
@@ -56,26 +67,21 @@ def main():
             dx = x2 - x1
             dy = y2 - y1
 
-            added = 0
-
             anti1 = calculate_anti_position((x1, y1), (dx, dy), '-')
             while in_bounds(lines, anti1):
                 anti_nodes.add(anti1)
                 anti1 = calculate_anti_position(anti1, (dx, dy), '-')
-                added += 1
 
             anti2 = calculate_anti_position((x2, y2), (dx, dy), '+')
             while in_bounds(lines, anti2):
                 anti_nodes.add(anti2)
                 anti2 = calculate_anti_position(anti2, (dx, dy), '+')
-                added += 1
-            
-            if added >= 1:
-                anti_nodes.add((x1, y1))
-                anti_nodes.add((x2, y2))
+
+            anti_nodes.add((x1, y1))
+            anti_nodes.add((x2, y2))
     
-        print('finished with', antenna_type)
-        print_grid(grid, anti_nodes, lines)
+        # print(f'antenna type {antenna_type}: finished')
+        # print_grid(grid, anti_nodes, lines)
 
     # print_grid(grid, anti_nodes, lines)
 
