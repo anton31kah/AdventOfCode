@@ -72,18 +72,10 @@ def main():
         print(f'after {i + 1} seconds')
         print_robots(robots, boundaries)
     
-    quadrants = defaultdict(int)
-
-    for robot in robots:
-        quadrants[robot.quadrant()] += 1
-    
-    total = 1
-
-    for quadrant, amount in quadrants.items():
-        if isinstance(quadrant, int) and 1 <= quadrant <= 4:
-            total *= amount
-    
-    print(total)
+    # solution is:
+    # `python3 src.year2024.day14.part2 > out.txt`
+    # then open file in klogg and search for "xxxxxxxxxxxxxx"
+    # then find number above it :)
 
 
 if __name__ == "__main__":
