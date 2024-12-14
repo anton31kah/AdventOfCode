@@ -1,5 +1,6 @@
 import inspect
 import os
+from timeit import default_timer as timer
 
 
 def __get_caller_frame():
@@ -28,3 +29,10 @@ def get_lines(suffix='', *, strip=True):
     file_path = __get_caller_file_path()
     with open(f'{file_path}/in{suffix}.txt') as f:
         return [__strip(line) if strip else line.removesuffix('\n') for line in f.readlines()]
+
+
+def timeme(func):
+    start = timer()
+    func()
+    end = timer()
+    print('took', end - start, 'seconds')
